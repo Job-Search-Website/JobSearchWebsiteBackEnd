@@ -14,12 +14,23 @@ func InitRouter(r *gin.Engine) {
 	}
 	config.AllowAllOrigins = true
 	r.Use(cors.New(config))
-	api := r.Group("/service")
+	api := r.Group("/api")
 	{
 		user := api.Group("/auth")
 		{
 			user.Use(cors.Default())
 			user.POST("/signup", service.Signup)
+		}
+		resume := api.Group("/resume")
+		{
+			resume.Use(cors.Default())
+			resume.GET("",service.GetResume)
+			resume.POST("",service.ReleaseResume)
+		}
+		hr := api.Group("/hr")
+		{
+			hr.Use(cors.Default())
+			hr.GET("hr_list",service.GetHrList)
 		}
 	}
 }
