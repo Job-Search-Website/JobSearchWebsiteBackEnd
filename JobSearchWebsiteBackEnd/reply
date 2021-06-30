@@ -1,0 +1,4 @@
+ID              唯一标识   主键
+hremail         hr邮箱
+jobseekeremail  求职者邮箱
+replycontext    回复的内容

@@ -24,3 +24,4 @@ func Signup(context *gin.Context) {
 	})
 	return
 }
+

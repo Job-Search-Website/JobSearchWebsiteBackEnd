@@ -20,6 +20,7 @@ func InitRouter(r *gin.Engine) {
 		{
 			user.Use(cors.Default())
 			user.POST("/signup", service.Signup)
+
 		}
 		resume := api.Group("/resume")
 		{
