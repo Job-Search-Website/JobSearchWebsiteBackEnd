@@ -25,3 +25,15 @@ func Signup(context *gin.Context) {
 	return
 }
 
+func Login (context *gin.Context) {
+	password := context.PostForm("password")
+	email := context.PostForm("email")
+
+	if(dao.IsEmailandPasswordMatched(email ,password)) {
+		// token
+	} else {
+		context.JSON(http.StatusBadRequest, gin.H{
+			"msg": "用户名密码不匹配",
+		})
+	}
+}
