@@ -23,13 +23,14 @@ func InitRouter(r *gin.Engine) {
 			user.POST("/login", service.Login)
 			user.POST("/introduction",service.Introduction)
 			user.GET("/myself",service.GetMyself)
-
+			user.GET("/myhr",service.GetMyResume)
+			user.GET("/myjobseeker",service.GetMyJobSeeker)
 		}
 		resume := api.Group("/resume")
 		{
 			resume.Use(cors.Default())
-			resume.GET("",service.GetResume)
-			resume.POST("",service.ReleaseResume)
+			resume.POST("replyresume",service.ReplyResume)
+			resume.POST("releaseresume",service.ReleaseResume)
 		}
 		hr := api.Group("/hr")
 		{
