@@ -6,4 +6,5 @@ type User struct {
 	Password          string
 	RegisterTimestamp int64
 	Role              string
+	Introduction	  string
 }

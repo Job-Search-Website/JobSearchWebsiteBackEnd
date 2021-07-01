@@ -37,6 +37,22 @@ func Login (context *gin.Context) {
 		})
 	}
 }
+func Introduction(context *gin.Context){
+	email:=context.PostForm("email")
+	introduction:=context.PostForm("introduction")
+	dao.EditIntroduction(email,introduction)
+	context.JSON(http.StatusOK,gin.H{
+		"msg":"编辑成功",
+	})
+}
 func GetMyself(context *gin.Context){
+	email:=context.PostForm("email")
+	user,_:=dao.GetUser(email)
+	context.JSON(http.StatusOK,gin.H{
+		"email":user.Email,
+		"name": user.Username,
+		"role":user.Role,
+		"introduction":user.Introduction,
+	})
 
 }

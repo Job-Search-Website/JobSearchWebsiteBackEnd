@@ -18,3 +18,10 @@ func IsEmailandPasswordMatched (email string, psw string) (isEmailandPasswordMat
 	}
 	return
 }
+func EditIntroduction(email string,introduction string){
+	db.Model(&models.User{}).Where("email = ?",email).Update("introduction",introduction)
+}
+func GetUser(email string)(user models.User,err bool){
+	db.Where("email=?",email).Find(&user)
+	return
+}
