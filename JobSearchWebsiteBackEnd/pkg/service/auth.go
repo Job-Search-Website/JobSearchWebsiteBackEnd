@@ -37,3 +37,6 @@ func Login (context *gin.Context) {
 		})
 	}
 }
+func GetMyself(context *gin.Context){
+
+}
