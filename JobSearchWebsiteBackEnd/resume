@@ -1,7 +1,0 @@
-id               简历ID     主键
-releasetime      时间戳
-jobseekeremail   求职者邮箱
-hremail          hr邮箱
-is_replay        boolen值，标识该简历是否被评价
-resumecontext    简历内容
-evaluation       评价内容
