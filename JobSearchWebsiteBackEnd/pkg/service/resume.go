@@ -3,6 +3,7 @@ package service
 import (
 	"github.com/Job-Search-Website/models"
 	"github.com/Job-Search-Website/pkg/dao"
+	"github.com/Job-Search-Website/pkg/util"
 	"github.com/gin-gonic/gin"
 	"net/http"
 	"strconv"
@@ -18,12 +19,12 @@ func ReplyResume(context *gin.Context){
 	})
 }
 func ReleaseResume(context *gin.Context){
-	job_seeker_email:=context.PostForm("job_seeker_email")
+	job_seeker_email,_:=util.GetEmailFromToken(context)
 	hr_email:=context.PostForm("hr_email")
 	resume_context:=context.PostForm("resume_context")
 	releasetime:=time.Now()
 	resume:=models.Resume{
-		JobSeekerEmail:job_seeker_email,HrEmail:hr_email,IsReplied:false,ResumeContext:resume_context,ReleseTime: releasetime,
+		JobSeekerEmail:job_seeker_email,HrEmail:hr_email,IsReplied:false,ResumeContext:resume_context,ReleseTime: releasetime,ReplyTime:releasetime,
 	}
 	dao.CreateResume(resume)
 	context.JSON(http.StatusOK,gin.H{

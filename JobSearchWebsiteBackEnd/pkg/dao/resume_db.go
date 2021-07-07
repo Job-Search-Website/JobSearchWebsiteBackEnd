@@ -6,11 +6,11 @@ import (
 )
 
 func GetResumeByJobSeeker(email string)(resumes []models.Resume){
-	db.Where("jobseekeremail",email).Find(&resumes)
+	db.Where("job_seeker_email=?",email).Find(&resumes)
 	return
 }
 func GetResumeByHr(email string)(resumes []models.Resume){
-	db.Where("hremail",email).Find(&resumes)
+	db.Where("hr_email=?",email).Find(&resumes)
 	return
 }
 func ReplyResume(resume_id int,reply string,){

@@ -2,8 +2,10 @@ package service
 
 import (
 	"github.com/Job-Search-Website/models"
+	"github.com/Job-Search-Website/pkg/consts"
 	"github.com/Job-Search-Website/pkg/dao"
 	"github.com/Job-Search-Website/pkg/util"
+	"github.com/dgrijalva/jwt-go"
 	"github.com/gin-gonic/gin"
 	"net/http"
 )
@@ -14,6 +16,18 @@ func Signup(context *gin.Context) {
 	name := context.PostForm("name")
 	role := context.PostForm("role")
 	passwordhash := util.HashWithSalt(password)
+	if email==""{
+		context.JSON(http.StatusBadRequest, gin.H{
+			"msg": "邮箱不能为空",
+		})
+		return
+	}
+	if dao.IsEmailRegistered(email) {
+		context.JSON(http.StatusBadRequest, gin.H{
+			"msg": "该用户已经注册",
+		})
+		return
+	}
 	user := models.User{
 		Email: email, Password: passwordhash, Username: name, RegisterTimestamp: util.GetTimeStamp(),
 		Role: role}
@@ -28,9 +42,14 @@ func Signup(context *gin.Context) {
 func Login (context *gin.Context) {
 	password := context.PostForm("password")
 	email := context.PostForm("email")
+	token, _ := util.GenerateToken(email,password)
 
-	if(dao.IsEmailandPasswordMatched(email ,password)) {
+	if dao.IsEmailandPasswordMatched(email ,password) {
 		// token
+		context.JSON(http.StatusBadRequest, gin.H{
+			"msg":"登录成功",
+			"token": token,
+		})
 	} else {
 		context.JSON(http.StatusBadRequest, gin.H{
 			"msg": "用户名密码不匹配",
@@ -39,7 +58,7 @@ func Login (context *gin.Context) {
 	return
 }
 func Introduction(context *gin.Context){
-	email:=context.PostForm("email")
+	email,_:=util.GetEmailFromToken(context)
 	introduction:=context.PostForm("introduction")
 	dao.EditIntroduction(email,introduction)
 	context.JSON(http.StatusOK,gin.H{
@@ -48,7 +67,7 @@ func Introduction(context *gin.Context){
 	return
 }
 func GetMyself(context *gin.Context) {
-	email := context.PostForm("email")
+	email,_:=util.GetEmailFromToken(context)
 	user, _ := dao.GetUser(email)
 	context.JSON(http.StatusOK, gin.H{
 		"email":        user.Email,
@@ -59,7 +78,7 @@ func GetMyself(context *gin.Context) {
 	return
 }
 func GetMyResume(context *gin.Context){
-	email:=context.PostForm("email")
+	email,_:=util.GetEmailFromToken(context)
 	resume:=dao.GetResumeByJobSeeker(email)
 	results:=[]map[string]interface{}{}
 	for _,temp:=range resume{
@@ -82,6 +101,7 @@ func GetMyResume(context *gin.Context){
 				"releasetime":   temp.ReleseTime,
 				"hrname":		 user.Username,
 				"hrintroduction":user.Introduction,
+				"reply":"还没有收到回复",
 			})
 		}
 	}
@@ -91,7 +111,7 @@ func GetMyResume(context *gin.Context){
 	return
 }
 func GetMyJobSeeker(context *gin.Context){
-	email:=context.PostForm("email")
+	email,_:=util.GetEmailFromToken(context)
 	resume:=dao.GetResumeByHr(email)
 	results:=[]map[string]interface{}{}
 	for _,temp:=range resume{
@@ -104,6 +124,7 @@ func GetMyJobSeeker(context *gin.Context){
 				"releasetime":   temp.ReleseTime,
 				"replytime":     temp.ReplyTime,
 				"jobseekername": user.Username,
+				"resume_id":temp.ID,
 			})
 		}else{
 			user,_:=dao.GetUser(temp.HrEmail)
@@ -112,6 +133,8 @@ func GetMyJobSeeker(context *gin.Context){
 				"resumecontext": temp.ResumeContext,
 				"releasetime":   temp.ReleseTime,
 				"jobseekername": user.Username,
+				"reply":"还没有回复",
+				"resume_id":temp.ID,
 			})
 		}
 	}
@@ -119,4 +142,29 @@ func GetMyJobSeeker(context *gin.Context){
 		"resume":results,
 	})
 	return
+}
+func Auth() gin.HandlerFunc {
+	return func(context *gin.Context) {
+		tokenString:= context.GetHeader("token")
+		claim, err := util.GetClaimFromToken(tokenString)
+		if err != nil {
+			context.Abort()
+			context.JSON(http.StatusUnauthorized, gin.H{
+				"msg": "未认证，请先登录",
+			})
+			return
+		}
+
+		//using assert is very dangerous
+		tokenTimeStamp := claim.(jwt.MapClaims)["timeStamp"].(float64)
+		time := util.GetTimeStamp() - int64(tokenTimeStamp)
+		if time > consts.EXPIRE_TIME_TOKEN {
+			context.Abort()
+			context.JSON(http.StatusUnauthorized, gin.H{
+				"msg": "Token过期，请重新登录",
+			})
+		}
+
+
+	}
 }

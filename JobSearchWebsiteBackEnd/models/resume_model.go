@@ -3,7 +3,7 @@ package models
 import "time"
 
 type Resume struct {
-	ID		string	`gorm:"primary_key"`
+	ID		uint	`gorm:"primary_key"`
 	HrEmail string
 	JobSeekerEmail string
 	IsReplied	bool

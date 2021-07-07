@@ -8,8 +8,8 @@ import (
 )
 
 func GetHrList(context *gin.Context){
-	page,_:=strconv.Atoi(context.PostForm("page"))
-	number,_:=strconv.Atoi(context.PostForm("number"))
+	page,_:=strconv.Atoi(context.Query("page"))
+	number,_:=strconv.Atoi(context.Query("number"))
 	hrs:=dao.GetHrList(page,number)
 	results:=[]map[string]interface{}{}
 	for _,temp:=range hrs{

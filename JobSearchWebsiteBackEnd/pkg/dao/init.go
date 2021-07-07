@@ -36,6 +36,8 @@ func databaseInit() {
 	var temp []interface{}
 	var user models.User
 	var resume models.Resume
-	temp = append(temp,user,resume )
+	var blog models.Blog
+	var comment	models.Comment
+	temp = append(temp,user,resume ,blog,comment)
 	util.CreateTableIfNotExist(db, temp)
 }
